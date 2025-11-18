@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html th:replace="~{layouts/generic :: layout(~{::title}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase add</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+<main>
+    <div class="main-container">
+        <h1>Purchase add</h1>
+
+        <form th:action="@{/purchase/add}" th:object="${purchase}" method="post" class="form-container">
+
+            <div class="form-group">
+                <label for="profile">Profile</label>
+                <select id="profile" name="profile">
+                    <option th:each="pr : ${profiles}"
+                            th:value="${pr.id}"
+                            th:text="${pr.name}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="food">Food</label>
+                <select id="food" name="food.id">
+                    <option th:each="f : ${foods}"
+                            th:value="${f.id}"
+                            th:text="${f.name}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="purchaseDate">Purchase Date</label>
+                <input type="date" id="purchaseDate" name="purchaseDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" required>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" step="0.01" id="price" name="price">
+            </div>
+
+            <div class="form-group">
+                <label for="store">Store</label>
+                <input type="text" id="store" name="store">
+            </div>
+
+            <input type="submit" value="Save">
+        </form>
+
+
+    </div>
+</main>
+</body>
+</html>

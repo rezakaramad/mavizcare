@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html th:replace="~{layouts/generic :: layout(~{::title}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase list</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+<main>
+
+    <div class="narrow-container">
+
+        <div class="main-container">
+            <h1>Purchase list</h1>
+
+            <div>
+                <a href="/purchase/add">&#x2795; Add</a><br><br>
+            </div>
+
+            <div class="table-container limited-width">
+                <table class="styled-table">
+                    <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Food</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="p : ${purchases}"
+                        th:onclick="'window.location.href=\'/purchase/' + ${p.id} + '\''"
+                        class="clickable-row">
+                        <td th:text="${p.profile.name}">Profile</td>
+
+                        <td>
+                            <a th:href="@{'/purchase/' + ${p.id}}"
+                               th:text="${p.food.name}"
+                               th:title="'View purchase details'">
+                                Food
+                            </a>
+                        </td>
+
+                        <td th:text="${p.purchaseDate}">2024-12-12</td>
+                        <td th:text="${p.quantity}">2</td>
+                        <td th:text="${p.price}">10.99</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+</body>
+</html>

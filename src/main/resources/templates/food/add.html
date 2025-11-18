@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html th:replace="~{layouts/generic :: layout(~{::title}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Food</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+<main>
+    <div class="main-container">
+
+        <h1>Add Food</h1>
+
+        <a href="/food/list">← 📋 Back to list</a>
+        <br>
+
+        <div class="form-container">
+            <form th:action="@{/food/add}" th:object="${food}" method="post">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" th:field="*{name}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="brand">Brand</label>
+                    <input id="brand" type="text" th:field="*{brand}">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <input id="category" type="text" th:field="*{category}">
+                </div>
+
+                <input type="submit" value="Save">
+            </form>
+        </div>
+
+    </div>
+</main>
+</body>
+</html>

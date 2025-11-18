@@ -1,0 +1,38 @@
+package com.github.rezakaramad.mavizcare.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "profiles")   // REQUIRED because table name is plural
+public class Profile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    public Profile() {}
+
+    public Profile(String name) {
+        this.name = name;
+    }
+
+    // --- Getters & Setters ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}

@@ -1,2 +1,3 @@
-# maviz
-A flexible demo application used to explore CI/CD, GitOps, observability, and modern software delivery practices.
+# maviz-the-coding-cat
+
+Demo apps for exploring CI/CD, GitOps, software delivery practices, and observability — learning real developer workflows to understand their day-to-day pain points.

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="layout(title, main)"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">Layout title</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+    <header th:replace="~{fragments/navigation :: navbar}"></header>
+
+    <main id="mainpart" th:replace="${main}" style="flex-grow: 1;">
+        <p><em>This content must not be visible.</em></p>
+    </main>
+    
+    <footer th:replace="~{fragments/footer :: siteFooter}"></footer>
+</body>
+</html>
