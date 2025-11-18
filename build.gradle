@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.rezakaramad"
-version = System.getenv("ARTIFACT_VERSION") ?: new Random().nextInt(999999).toString().padLeft(5, '0')
+version = project.findProperty("version") ?: "0.0.0-local"
 
 java {
 	toolchain {

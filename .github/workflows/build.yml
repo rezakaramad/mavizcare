@@ -20,6 +20,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next version
+        id: setver
+        run: |
+          VERSION=$(scripts/next-version.sh)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -37,30 +45,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Build JAR
+        run: ./gradlew -Pversion=${{ steps.setver.outputs.version }} bootJar --no-daemon
 
-      - name: Install semantic-release
-        run: npm ci
-
-      - name: Run semantic-release
-        id: semantic_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION=$(npx semantic-release | sed -n 's/^New version: //p')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Build JAR with version
-        run: ./gradlew -Pversion=${{ steps.semantic_release.outputs.version }} bootJar --no-daemon
-
-      - name: Upload JAR artifact
+      - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: mavizcare-jar
           path: build/libs/*.jar
+
+      - name: Create Git tag
+        run: |
+          VERSION=${{ steps.setver.outputs.version }}
+          git tag v$VERSION
+          git push origin v$VERSION
 
   docker:
     name: Build & Push Docker Image
@@ -78,7 +76,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mavizcare-jar
-          path: mavizcare-jar
+          path: jar
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -93,8 +91,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/spring-app:latest
-            ghcr.io/${{ github.repository_owner }}/spring-app:${{ needs.build.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/mavizcare:latest
+            ghcr.io/${{ github.repository_owner }}/mavizcare:${{ needs.build.outputs.version }}
           build-args: |
             JAR_FILE=$(ls jar/*.jar)
           cache-from: type=gha
