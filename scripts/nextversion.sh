@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
 set -e
 
-# Get latest tag (like "v1.4.2")
-LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+# Try to get the latest tag
+if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+  LATEST_TAG=$(git describe --tags --abbrev=0)
+else
+  LATEST_TAG="v0.0.0"
+fi
 
 # Remove "v"
-LATEST_VERSION=${LATEST_TAG#v}
+LATEST_VERSION="${LATEST_TAG#v}"
 
 IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_VERSION"
 
-# Get commit messages since last tag
-COMMITS=$(git log $LATEST_TAG..HEAD --pretty=format:"%s")
+# If this is the first release, avoid invalid git log
+if [ "$LATEST_TAG" = "v0.0.0" ]; then
+  COMMITS=$(git log --pretty=format:"%s")
+else
+  COMMITS=$(git log "${LATEST_TAG}"..HEAD --pretty=format:"%s")
+fi
 
+# Default bump: patch
 BUMP="patch"
 
 if echo "$COMMITS" | grep -q "feat!"; then
