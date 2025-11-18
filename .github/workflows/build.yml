@@ -3,7 +3,6 @@ name: Build
 on:
   push:
     branches: ["main"]
-  pull_request:
   workflow_dispatch:
 
 env:
@@ -12,34 +11,20 @@ env:
 
 jobs:
   gradle:
-    name: Build & Test Spring Boot App
+    name: Build Spring Boot JAR
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     outputs:
-      version: ${{ steps.setver.outputs.version }}
+      sha: ${{ steps.sha.outputs.sha }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Fetch tags
-        run: git fetch --tags --force
-
-      - name: Compute next version
-        id: setver
-        run: |
-          VERSION=$(scripts/nextversion.sh)
-          echo "Computed VERSION=$VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create tag
-        run: |
-          VERSION=${{ steps.setver.outputs.version }}
-          git tag -f "v$VERSION"
-          git push --force origin "v$VERSION"
+      - name: Expose commit SHA
+        id: sha
+        run: echo "sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -54,17 +39,16 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Build JAR
-        run: ./gradlew -Pversion=${{ steps.setver.outputs.version }} bootJar --no-daemon
+        run: ./gradlew -Pversion=${GITHUB_SHA} bootJar --no-daemon
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: mavizcare-jar
-          path: build/libs/*.jar
+          path: build/libs/mavizcare-${GITHUB_SHA}.jar
+
 
   docker:
     name: Build & Push Docker Image
@@ -80,14 +64,19 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
         with:
-          install: true
           driver: docker-container
-          
+
+      - name: Expose SHA
+        run: echo "SHA=${{ needs.gradle.outputs.sha }}" >> $GITHUB_ENV
+
       - name: Download JAR artifact
         uses: actions/download-artifact@v4
         with:
           name: mavizcare-jar
           path: jar
+
+      - name: Resolve JAR file
+        run: echo "JAR_FILE=$(ls jar/*.jar)" >> $GITHUB_ENV
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -96,17 +85,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Resolve JAR file
-        run: echo "JAR_FILE=$(ls jar/*.jar)" >> $GITHUB_ENV
-
       - name: Build & push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
+            ghcr.io/${{ github.repository_owner }}/mavizcare:${{ env.SHA }}
             ghcr.io/${{ github.repository_owner }}/mavizcare:latest
-            ghcr.io/${{ github.repository_owner }}/mavizcare:${{ needs.gradle.outputs.version }}
           build-args: |
             JAR_FILE=${{ env.JAR_FILE }}
           cache-from: type=gha
