@@ -15,7 +15,7 @@ jobs:
     name: Build & Test Spring Boot App
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     outputs:
       version: ${{ steps.semantic_release.outputs.version }}
 
