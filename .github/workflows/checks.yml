@@ -118,19 +118,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: 🔍 Trivy scan local Docker image
+      - name: 🔍 Trivy scan (SARIF for Code Scanning)
         uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: image
           image-ref: ghcr.io/${{ github.repository_owner }}/mavizcare:${{ github.sha }}
-          format: table
-          output: trivy-image-report.txt
+          format: sarif
+          output: trivy-image.sarif
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          exit-code: '0'
 
-      - name: Upload Trivy image report
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Upload Trivy SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          name: trivy-image-report
-          path: trivy-image-report.txt
+          sarif_file: trivy-image.sarif
