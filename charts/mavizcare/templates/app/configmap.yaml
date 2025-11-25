@@ -1,6 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "springboot.fullname" . }}
+  name: {{ include "springboot.appname" . }}
+  labels:
+    {{- include "springboot.labels" . | nindent 4 }}
 data:
-  LOGGING_LEVEL_ROOT: {{ .Values.logging.root | quote }}
+  application.yaml: |-
+{{ .Values.appConfig | nindent 4 }}
+

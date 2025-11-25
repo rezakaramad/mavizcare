@@ -12,7 +12,7 @@ fullnameOverride: ""
 replicas: 1
 
 image:
-  repository: "your-docker-registry/mavizcare"
+  repository: "your-docker-registry/petcare"
   tag: ""
   pullPolicy: IfNotPresent
 
@@ -20,7 +20,7 @@ containerPort: 8080
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
 
 logging:
   root: INFO
@@ -35,6 +35,8 @@ resources: {}
 nodeSelector: {}
 affinity: {}
 tolerations: []
+
+appConfig: ""
 
 # --------------------------------------------------------
 # DATABASE (MariaDB)
@@ -52,7 +54,7 @@ mariadb:
 
   username: "user"
   password: "password"
-  database: "mavizcare"
+  database: "petcare"
 
   envConfigMap: true
 
