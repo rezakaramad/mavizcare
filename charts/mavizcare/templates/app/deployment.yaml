@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: {{ include "springboot.fullname" . }}
+  name: {{ include "springboot.appname" . }}
   labels:
     {{- include "springboot.labels" . | nindent 4 }}
     app.kubernetes.io/component: app
@@ -34,24 +34,29 @@ spec:
 
           envFrom:
             - secretRef:
-                name: {{ include "springboot.fullname" . }}
+                name: {{ include "springboot.appname" . }}
             {{- if .Values.envConfigMap }}
             - configMapRef:
-                name: {{ include "springboot.fullname" . }}
+                name: {{ include "springboot.appname" . }}
             {{- end }}
 
-          {{- if .Values.volumeMounts }}
           volumeMounts:
+            - name: app-config
+              mountPath: /config
+            {{- if .Values.volumeMounts }}
             {{- toYaml .Values.volumeMounts | nindent 12 }}
-          {{- end }}
+            {{- end }}
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 
-      {{- if .Values.volumes }}
       volumes:
+        - name: app-config
+          configMap:
+            name: {{ include "springboot.appname" . }}
+        {{- if .Values.volumes }}
         {{- toYaml .Values.volumes | nindent 8 }}
-      {{- end }}
+        {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
