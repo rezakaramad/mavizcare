@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "springboot.fullname" . }}
+  labels:
+    {{- include "springboot.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+
+spec:
+
+  replicas: {{ .Values.replicas }}
+
+  selector:
+    matchLabels:
+      {{- include "springboot.selectorLabels" . | nindent 6 }}
+
+  template:
+    metadata:
+      labels:
+        {{- include "springboot.selectorLabels" . | nindent 8 }}
+
+    spec:
+      containers:
+
+        - name: {{ include "springboot.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+
+          envFrom:
+            - secretRef:
+                name: {{ include "springboot.fullname" . }}
+            {{- if .Values.envConfigMap }}
+            - configMapRef:
+                name: {{ include "springboot.fullname" . }}
+            {{- end }}
+
+          {{- if .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      {{- if .Values.volumes }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
