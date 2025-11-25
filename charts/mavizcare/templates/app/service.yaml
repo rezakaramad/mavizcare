@@ -12,8 +12,7 @@ spec:
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.containerPort }}
-      protocol: TCP
-      name: http
+      targetPort: http
 
   selector:
     {{- include "springboot.selectorLabels" . | nindent 4 }}
