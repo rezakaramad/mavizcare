@@ -52,6 +52,7 @@ mariadb:
 
   port: 3306
 
+  rootPassword: "password"
   username: "user"
   password: "password"
   database: "petcare"
