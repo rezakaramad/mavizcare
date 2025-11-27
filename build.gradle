@@ -8,9 +8,9 @@ plugins {
 }
 
 group = "com.github.rezakaramad"
-version = (project.findProperty("version")
-        ?: System.getenv("VERSION")
-        ?: "0.1.0-SNAPSHOT")
+name = "petcare"
+version = findProperty("version") ?: "0.1.0-SNAPSHOT"
+app = findProperty("app") ?: project.name
 
 java {
 	toolchain {
@@ -22,9 +22,9 @@ tasks.named("jar") {
     enabled = false
 }
 
-bootJar {
+tasks.named("bootJar") {
     enabled = true
-    archiveBaseName = "petcare"
+    archiveBaseName = project.app
     archiveVersion  = project.version
 }
 

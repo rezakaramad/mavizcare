@@ -41,6 +41,9 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
+      - name: Build JAR
+        run: ./gradlew -Papp=${APP} -Pversion=${{ env.VERSION }} bootJar --no-daemon
+
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
